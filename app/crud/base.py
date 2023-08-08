@@ -29,19 +29,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             )
         )
         return db_obj.scalars().first()
-    
-    async def get_by_attribute(
-        self, 
-        attr_name: str, 
-        attr_value: str,
-        session: AsyncSession,
-    ):
-        '''Возможный метод'''
-        attr = getattr(self.model, attr_name)
-        db_obj = await session.execute(
-            select(self.model).where(attr == attr_value)
-        )
-        return db_obj.scalars().first() 
 
     async def get_multi(
         self, 
@@ -49,6 +36,18 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         db_objs = await session.execute(select(self.model))
         return db_objs.scalars().all()
+    
+    async def get_multi_my(
+        self, 
+        session: AsyncSession,
+        user: User
+    ) -> List[ModelType]:
+        db_obj = await session.execute(
+            select(self.model).where(
+                self.model.user_id == user.id
+            )
+        )
+        return db_obj.scalars().all()
 
     async def create(
         self,

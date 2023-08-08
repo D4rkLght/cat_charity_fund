@@ -23,7 +23,7 @@ class CharityProjectUpdate(CharityProjectBase):
         return value
 
 
-class CharityProjectDB(CharityProjectCreate):
+class CharityProjectDB(CharityProjectBase):
     id: int
     invested_amount: int
     fully_invested: bool
