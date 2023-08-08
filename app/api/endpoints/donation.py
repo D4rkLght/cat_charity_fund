@@ -14,6 +14,7 @@ from app.schemas.donation import (
 )
 from app.core.user import current_superuser, current_user
 from app.models import User
+from app.services.investments import investments
 
 router = APIRouter()
 
@@ -29,6 +30,7 @@ async def create_donation(
     user: User = Depends(current_user),
 ):
     new_donation = await donation_crud.create(donation, session, user)
+    await investments(new_donation, session)
     return new_donation
 
 
@@ -36,10 +38,12 @@ async def create_donation(
     '/',
     response_model=List[DonationDB],
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def get_all_donations(
     session: AsyncSession = Depends(get_async_session),
 ):
+    '''Только для суперюзеров.'''
     all_donations = await donation_crud.get_multi(session)
     return all_donations
 

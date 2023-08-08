@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импортируем асинхронный генератор сессий.
-from app.api.validators import check_name_duplicate, check_charity_project_exists
+from app.api.validators import check_name_duplicate, check_charity_project_exists, check_investments
 from app.core.db import get_async_session
 from app.crud.charityproject import charityproject_crud
 from app.schemas.charityproject import (
@@ -21,13 +21,13 @@ router = APIRouter()
     '/',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
-    # dependencies=[Depends(current_superuser)],
+    dependencies=[Depends(current_superuser)],
 )
 async def create_new_charity_project(
     project: CharityProjectCreate,
     session: AsyncSession = Depends(get_async_session),
 ):
-    # """Только для суперюзеров."""
+    '''Только для суперюзеров.'''
     await check_name_duplicate(project.name, session)
     new_project = await charityproject_crud.create(project, session)
     return new_project
@@ -49,14 +49,17 @@ async def all_charity_projects(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def remove_charity_project(
     charity_project_id: int,
     session: AsyncSession = Depends(get_async_session),
 ):
+    '''Только для суперюзеров.'''
     charity_project = await check_charity_project_exists(
         charity_project_id, session
     )
+    await check_investments(charity_project_id, session)
     charity_project = await charityproject_crud.remove(
         charity_project, session
     )
@@ -67,12 +70,14 @@ async def remove_charity_project(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def update_charity_project(
     charity_project_id: int,
     obj_in: CharityProjectUpdate,
     session: AsyncSession = Depends(get_async_session)
 ):
+    '''Только для суперюзеров.'''
     charity_project = await check_charity_project_exists(
         charity_project_id, session
     )
