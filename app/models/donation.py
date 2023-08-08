@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, ForeignKey, Integer, DateTime
+from sqlalchemy import Column, Text, ForeignKey, Integer
 
 from .parent_base import Parent_Base
 

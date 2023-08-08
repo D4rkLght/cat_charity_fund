@@ -4,16 +4,17 @@ from typing import Optional
 from pydantic import BaseModel, Field, PositiveInt, validator
 
 
-class CharityProjectCreate(BaseModel):
+class CharityProjectBase(BaseModel):
     name: str = Field(..., max_length=100)
     description: Optional[str]
     full_amount: PositiveInt
 
 
-class CharityProjectUpdate(BaseModel):
-    name: str = Field(..., max_length=100)
-    description: Optional[str]
-    full_amount: PositiveInt
+class CharityProjectCreate(CharityProjectBase):
+    ...
+
+
+class CharityProjectUpdate(CharityProjectBase):
 
     @validator('name')
     def name_cannot_be_null(cls, value):
