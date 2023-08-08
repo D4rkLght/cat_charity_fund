@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.encoders import jsonable_encoder
 
 from app.crud.base import CRUDBase
-from app.models.charityproject import CharityProject
-from app.schemas.charityproject import CharityProjectCreate, CharityProjectUpdate
+from app.models.charity_project import CharityProject
+from app.schemas.charity_project import CharityProjectCreate, CharityProjectUpdate
 
 
 class CRUDCharityProject(CRUDBase[

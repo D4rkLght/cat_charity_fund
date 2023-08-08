@@ -2,7 +2,7 @@ from typing import Generic, List, Optional, Type, TypeVar
 
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select
+from sqlalchemy import select, not_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import Base
@@ -89,3 +89,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         await session.delete(db_obj)
         await session.commit()
         return db_obj
+
+    async def get_objects(
+        self,
+        session: AsyncSession,
+    ):
+        db_obj = await session.execute(
+            select(self.model).where(
+                not_(self.model.fully_invested)
+            )
+        )
+        return db_obj.scalars().all()

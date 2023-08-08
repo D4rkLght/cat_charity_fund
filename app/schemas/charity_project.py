@@ -15,6 +15,7 @@ class CharityProjectCreate(CharityProjectBase):
 
 
 class CharityProjectUpdate(CharityProjectBase):
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
 
     @validator('name')
     def name_cannot_be_null(cls, value):

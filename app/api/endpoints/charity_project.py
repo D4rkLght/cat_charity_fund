@@ -6,13 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импортируем асинхронный генератор сессий.
-from app.api.validators import check_name_duplicate, check_charity_project_exists, check_investments
+from app.api.validators import check_name, check_charity_project_exists, check_investments, check_full_amount
 from app.core.db import get_async_session
-from app.crud.charityproject import charityproject_crud
-from app.schemas.charityproject import (
+from app.crud.charity_project import charityproject_crud
+from app.schemas.charity_project import (
     CharityProjectCreate, CharityProjectUpdate, CharityProjectDB
 )
 from app.core.user import current_superuser
+from app.services.investments import investments
 
 router = APIRouter()
 
@@ -28,8 +29,11 @@ async def create_new_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     '''Только для суперюзеров.'''
-    await check_name_duplicate(project.name, session)
+    await check_name(project.name, session)
     new_project = await charityproject_crud.create(project, session)
+    session.add_all(await investments(new_project, session))
+    await session.commit()
+    await session.refresh(new_project)
     return new_project
 
 
@@ -81,8 +85,9 @@ async def update_charity_project(
     charity_project = await check_charity_project_exists(
         charity_project_id, session
     )
+    await check_full_amount(charity_project_id, session)
     if obj_in.name is not None:
-        await check_name_duplicate(obj_in.name, session)
+        await check_name(obj_in.name, session)
     charity_project = await charityproject_crud.update(
         charity_project, obj_in, session
     )

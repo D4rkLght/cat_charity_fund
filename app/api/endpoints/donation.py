@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импортируем асинхронный генератор сессий.
-from app.api.validators import check_name_duplicate, check_charity_project_exists
+from app.api.validators import check_name, check_charity_project_exists
 from app.core.db import get_async_session
 from app.crud.donation import donation_crud
 from app.schemas.donation import (
@@ -30,7 +30,9 @@ async def create_donation(
     user: User = Depends(current_user),
 ):
     new_donation = await donation_crud.create(donation, session, user)
-    await investments(new_donation, session)
+    session.add_all(await investments(new_donation, session))
+    await session.commit()
+    await session.refresh(new_donation)
     return new_donation
 
 
