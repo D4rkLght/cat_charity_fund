@@ -1,0 +1,41 @@
+PATCH  http://127.0.0.1:8000/charity_project/14/
+Content-Type: application/json
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSIsImF1ZCI6WyJmYXN0YXBpLXVzZXJzOmF1dGgiXSwiZXhwIjoxNjkxNjEzMTk0fQ.YF1q5ckqyBFvGQtVFeKebBlx1XFaZmO1K_hDGCMKalI
+
+{
+    "name": "chim4ts",
+    "description": "Give me the money!",
+    "full_amount": 1000000,
+    "id": 14,
+    "invested_amount": 0,
+    "fully_invested": false,
+    "close_date": null,
+    "create_date": "2010-10-10T00:00:00"
+}
+
+
+# {
+#   "name": "chimichangas4life",
+#   "description": "Give me the money!",
+#   "full_amount": 1000000
+# }
+
+# {
+
+#     "description": "Huge fan of chimichangas. Wanna buy a lot",
+#     "full_amount": 600
+# }
+
+# {
+
+    
+#     "description": "string",
+#     "full_amount": 600,
+#     "id": 8,
+#     "invested_amount": 0,
+#     "fully_invested": true,
+#     "create_date": "2019-08-24T14:15:22Z",
+
+
+# }
+

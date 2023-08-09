@@ -9,18 +9,21 @@ from app.models.parent_base import Parent_Base
 from app.models.donation import Donation
 
 
+def update(
+    model: Parent_Base,
+    amount: int
+) -> None:
+    model.invested_amount = (model.invested_amount or 0) + amount
+    if model.full_amount == model.invested_amount:
+        model.close_date = datetime.now()
+        model.fully_invested = True
+
+
 async def investments(
     model: Parent_Base,
     session: AsyncSession,
 ) -> list[Optional[Parent_Base]]:
-    def update(
-        model: Parent_Base,
-        amount: int
-    ) -> None:
-        model.invested_amount = (model.invested_amount or 0) + amount
-        if model.full_amount == model.invested_amount:
-            model.close_date = datetime.now()
-            model.fully_invested = True
+    
     update_object = []
     crud = (
         charityproject_crud

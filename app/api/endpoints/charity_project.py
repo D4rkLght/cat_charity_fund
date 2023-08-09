@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импортируем асинхронный генератор сессий.
-from app.api.validators import check_name, check_charity_project_exists, check_investments, check_full_amount
+from app.api.validators import check_charity_project_exists, check_investments, check_full_amount, check_project, check_fully_invested
 from app.core.db import get_async_session
 from app.crud.charity_project import charityproject_crud
 from app.schemas.charity_project import (
@@ -29,7 +29,7 @@ async def create_new_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     '''Только для суперюзеров.'''
-    await check_name(project.name, session)
+    await check_project(project, project.name, session)
     new_project = await charityproject_crud.create(project, session)
     session.add_all(await investments(new_project, session))
     await session.commit()
@@ -52,7 +52,6 @@ async def all_charity_projects(
 @router.delete(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
-    response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def remove_charity_project(
@@ -73,7 +72,6 @@ async def remove_charity_project(
 @router.patch(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
-    response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def update_charity_project(
@@ -82,12 +80,13 @@ async def update_charity_project(
     session: AsyncSession = Depends(get_async_session)
 ):
     '''Только для суперюзеров.'''
+    await check_fully_invested(charity_project_id, session)
     charity_project = await check_charity_project_exists(
         charity_project_id, session
     )
-    await check_full_amount(charity_project_id, session)
+    await check_full_amount(obj_in, charity_project_id, session)
     if obj_in.name is not None:
-        await check_name(obj_in.name, session)
+        await check_project(obj_in, obj_in.name, session)
     charity_project = await charityproject_crud.update(
         charity_project, obj_in, session
     )
