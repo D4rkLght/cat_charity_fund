@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.donation import donation_crud
 from app.crud.charity_project import charityproject_crud
-from app.models.parent_base import Parent_Base
+from app.crud.donation import donation_crud
 from app.models.donation import Donation
+from app.models.parent_base import Parent_Base
 
 
 def update(
@@ -22,20 +22,15 @@ def update(
 async def investments(
     model: Parent_Base,
     session: AsyncSession,
-) -> list[Optional[Parent_Base]]:
-    
+) -> List[Optional[Parent_Base]]:
     update_object = []
-    crud = (
-        charityproject_crud
-        if isinstance(model, Donation)
-            else donation_crud)
+    crud = [donation_crud, charityproject_crud][isinstance(model, Donation)]
     for objects in await crud.get_objects(session):
         amount = min(
             objects.full_amount - (objects.invested_amount or 0),
-            model.full_amount - (model.invested_amount or 0))
+            model.full_amount - (model.invested_amount or 0)
+        )
         update(model, amount)
         update(objects, amount)
         update_object.append(objects)
-        if model.fully_invested:
-            break
     return update_object

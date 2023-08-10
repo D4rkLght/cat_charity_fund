@@ -16,6 +16,7 @@ class DonationShortDB(DonationCreate):
     class Config:
         orm_mode = True
 
+
 class DonationDB(DonationCreate):
     id: int
     user_id: int

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.charity_project import charityproject_crud
-from app.models import CharityProject, User
+from app.models import CharityProject
 
 
 async def check_project(
@@ -20,7 +20,8 @@ async def check_project(
             status_code=422,
             detail='Отсутсвует описание!',
         )
-    
+
+
 async def check_project_name_duplicate(
     project_name: str,
     session: AsyncSession,
@@ -30,7 +31,7 @@ async def check_project_name_duplicate(
         raise HTTPException(
             status_code=400,
             detail='Проект с таким именем уже существует!',
-        )    
+        )
 
 
 async def check_charity_project_exists(

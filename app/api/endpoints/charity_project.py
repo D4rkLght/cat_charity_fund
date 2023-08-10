@@ -1,18 +1,18 @@
-from typing import Dict, List, Set, Tuple
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 
-# Импортируем класс асинхронной сессии для аннотации параметра.
-
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# Импортируем асинхронный генератор сессий.
-from app.api.validators import check_charity_project_exists, check_investments, check_full_amount, check_project, check_fully_invested, check_project_name_duplicate
+from app.api.validators import (check_charity_project_exists,
+                                check_full_amount, check_fully_invested,
+                                check_investments, check_project,
+                                check_project_name_duplicate)
 from app.core.db import get_async_session
-from app.crud.charity_project import charityproject_crud
-from app.schemas.charity_project import (
-    CharityProjectCreate, CharityProjectUpdate, CharityProjectDB
-)
 from app.core.user import current_superuser
+from app.crud.charity_project import charityproject_crud
+from app.schemas.charity_project import (CharityProjectCreate,
+                                         CharityProjectDB,
+                                         CharityProjectUpdate)
 from app.services.investments import investments
 
 router = APIRouter()

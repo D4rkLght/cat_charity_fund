@@ -1,5 +1,3 @@
-from fastapi import APIRouter
-
 from fastapi import APIRouter, HTTPException
 
 from app.core.user import auth_backend, fastapi_users

@@ -1,8 +1,8 @@
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
-from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select, not_
+from pydantic import BaseModel
+from sqlalchemy import not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import Base
@@ -19,7 +19,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     async def get(
-        self, 
+        self,
         obj_id: int,
         session: AsyncSession,
     ) -> Optional[ModelType]:
@@ -31,14 +31,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj.scalars().first()
 
     async def get_multi(
-        self, 
+        self,
         session: AsyncSession,
     ) -> List[ModelType]:
         db_objs = await session.execute(select(self.model))
         return db_objs.scalars().all()
-    
+
     async def get_multi_my(
-        self, 
+        self,
         session: AsyncSession,
         user: User
     ) -> List[ModelType]:
