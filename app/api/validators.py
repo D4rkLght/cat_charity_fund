@@ -10,12 +10,6 @@ async def check_project(
     project_name: str,
     session: AsyncSession,
 ) -> None:
-    project_id = await charityproject_crud.get_chairty_project_id_by_name(project_name, session)
-    if project_id is not None:
-        raise HTTPException(
-            status_code=400,
-            detail='Проект с таким именем уже существует!',
-        )
     if not project_name or len(project_name) > 100:
         raise HTTPException(
             status_code=422,
@@ -26,6 +20,18 @@ async def check_project(
             status_code=422,
             detail='Отсутсвует описание!',
         )
+    
+async def check_project_name_duplicate(
+    project_name: str,
+    session: AsyncSession,
+) -> None:
+    project_id = await charityproject_crud.get_chairty_project_id_by_name(project_name, session)
+    if project_id is not None:
+        raise HTTPException(
+            status_code=400,
+            detail='Проект с таким именем уже существует!',
+        )    
+
 
 async def check_charity_project_exists(
     project_id: int,
@@ -58,11 +64,12 @@ async def check_full_amount(
     session: AsyncSession
 ) -> None:
     project = await charityproject_crud.get(project_id, session)
-    if project.invested_amount > update_data.full_amount:
-        raise HTTPException(
-            status_code=422,
-            detail='Требуемая сумма меньше внесённой.',
-        )
+    if update_data.full_amount:
+        if project.invested_amount > update_data.full_amount:
+            raise HTTPException(
+                status_code=422,
+                detail='Требуемая сумма меньше внесённой.',
+            )
 
 
 async def check_description(

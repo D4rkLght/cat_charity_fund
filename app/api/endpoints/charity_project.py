@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Импортируем асинхронный генератор сессий.
-from app.api.validators import check_charity_project_exists, check_investments, check_full_amount, check_project, check_fully_invested
+from app.api.validators import check_charity_project_exists, check_investments, check_full_amount, check_project, check_fully_invested, check_project_name_duplicate
 from app.core.db import get_async_session
 from app.crud.charity_project import charityproject_crud
 from app.schemas.charity_project import (
@@ -30,6 +30,7 @@ async def create_new_charity_project(
 ):
     '''Только для суперюзеров.'''
     await check_project(project, project.name, session)
+    await check_project_name_duplicate(project.name, session)
     new_project = await charityproject_crud.create(project, session)
     session.add_all(await investments(new_project, session))
     await session.commit()
@@ -86,7 +87,7 @@ async def update_charity_project(
     )
     await check_full_amount(obj_in, charity_project_id, session)
     if obj_in.name is not None:
-        await check_project(obj_in, obj_in.name, session)
+        await check_project_name_duplicate(obj_in.name, session)
     charity_project = await charityproject_crud.update(
         charity_project, obj_in, session
     )
