@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import NO_INVESTED
 from app.crud.charity_project import charityproject_crud
 from app.crud.donation import donation_crud
 from app.models.donation import Donation
@@ -13,7 +14,7 @@ def update(
     model: Parent_Base,
     amount: int
 ) -> None:
-    model.invested_amount = (model.invested_amount or 0) + amount
+    model.invested_amount = (model.invested_amount or NO_INVESTED) + amount
     if model.full_amount == model.invested_amount:
         model.close_date = datetime.now()
         model.fully_invested = True
@@ -27,8 +28,8 @@ async def investments(
     crud = [donation_crud, charityproject_crud][isinstance(model, Donation)]
     for objects in await crud.get_objects(session):
         amount = min(
-            objects.full_amount - (objects.invested_amount or 0),
-            model.full_amount - (model.invested_amount or 0)
+            objects.full_amount - (objects.invested_amount or NO_INVESTED),
+            model.full_amount - (model.invested_amount or NO_INVESTED)
         )
         update(model, amount)
         update(objects, amount)
